@@ -4,6 +4,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 using ScheduleHelper.Pdf;
 using ScheduleHelper.Services;
+using ScheduleHelper.ViewModels;
 
 Settings.License = LicenseType.Community;
 
@@ -62,7 +63,8 @@ rootCommand.SetAction(parseResult =>
     var days = ScheduleBuilder.Build(config, startDate);
     var footnotes = ConflictChecker.Check(days, config.Conflicts);
 
-    var document = new ScheduleDocument(days, footnotes, config.Medications);
+    var viewModel = ScheduleViewModelBuilder.Build(days, footnotes, config.Medications);
+    var document = new ScheduleDocument(viewModel);
     document.GeneratePdf(output);
 
     Console.WriteLine($"Schedule generated: {output}");

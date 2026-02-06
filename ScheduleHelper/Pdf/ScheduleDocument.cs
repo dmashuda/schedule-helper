@@ -1,19 +1,12 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using ScheduleHelper.Models;
+using ScheduleHelper.ViewModels;
 
 namespace ScheduleHelper.Pdf;
 
-public class ScheduleDocument(
-    List<ScheduleDay> days,
-    List<ConflictFootnote> footnotes,
-    List<MedicationRule> medications)
-    : IDocument
+public class ScheduleDocument(ScheduleViewModel viewModel) : IDocument
 {
-    private static readonly TimeBlock[] AllBlocks =
-        [TimeBlock.Morning, TimeBlock.Midday, TimeBlock.Afternoon, TimeBlock.Evening, TimeBlock.Bedtime];
-
     public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
     public DocumentSettings GetSettings() => new()
@@ -38,13 +31,10 @@ public class ScheduleDocument(
 
     private void ComposeHeader(IContainer container)
     {
-        var startDate = days.First().Date;
-        var endDate = days.Last().Date;
-
         container.PaddingBottom(8).Column(col =>
         {
-            col.Item().Text("Medication Schedule Worksheet").Bold().FontSize(14);
-            col.Item().Text($"{startDate:MMMM d, yyyy} - {endDate:MMMM d, yyyy}").FontSize(10);
+            col.Item().Text(viewModel.Title).Bold().FontSize(14);
+            col.Item().Text(viewModel.DateRange).FontSize(10);
         });
     }
 
@@ -52,35 +42,31 @@ public class ScheduleDocument(
     {
         container.Table(table =>
         {
-            // Define columns: label + one per day
             table.ColumnsDefinition(cols =>
             {
-                cols.ConstantColumn(80); // time block label
-                foreach (var _ in days)
+                cols.ConstantColumn(80);
+                foreach (var _ in viewModel.Days)
                     cols.RelativeColumn();
             });
 
-            // Header row with day labels
             table.Header(header =>
             {
-                header.Cell().Element(HeaderCellStyle).Text("Time Block");
-                foreach (var day in days)
+                header.Cell().Element(HeaderCellStyle).Text(viewModel.TimeBlockColumnHeader);
+                foreach (var day in viewModel.Days)
                 {
-                    header.Cell().Element(HeaderCellStyle)
-                        .Text($"Day {day.DayNumber}\n{day.Date:ddd M/d}");
+                    header.Cell().Element(HeaderCellStyle).Text(day.Header);
                 }
             });
 
-            // One row per time block
-            foreach (var block in AllBlocks)
+            for (var blockIndex = 0; blockIndex < viewModel.TimeBlockLabels.Count; blockIndex++)
             {
-                table.Cell().Element(LabelCellStyle).Text(BlockLabel(block));
+                table.Cell().Element(LabelCellStyle).Text(viewModel.TimeBlockLabels[blockIndex]);
 
-                foreach (var day in days)
+                foreach (var day in viewModel.Days)
                 {
+                    var entries = day.TimeBlockEntries[blockIndex];
                     table.Cell().Element(DataCellStyle).Column(col =>
                     {
-                        var entries = day.Entries[block];
                         if (entries.Count == 0)
                         {
                             col.Item().Text("").FontSize(7);
@@ -91,14 +77,13 @@ public class ScheduleDocument(
                             {
                                 col.Item().Row(row =>
                                 {
-                                    // Checkbox
                                     row.ConstantItem(12).Height(10).Width(10)
                                         .Border(0.75f).BorderColor(Colors.Black);
 
                                     row.RelativeItem().PaddingLeft(3).Text(text =>
                                     {
-                                        text.Span($"{entry.MedicationName} {entry.Dose}").FontSize(7);
-                                        foreach (var fn in entry.ConflictFootnotes)
+                                        text.Span(entry.Label).FontSize(7);
+                                        foreach (var fn in entry.FootnoteNumbers)
                                         {
                                             text.Span($" [{fn}]").FontSize(6).Bold().FontColor(Colors.Red.Medium);
                                         }
@@ -106,7 +91,7 @@ public class ScheduleDocument(
                                 });
                             }
 
-                            col.Item().PaddingTop(3).Text("Time: ____").FontSize(6).Italic();
+                            col.Item().PaddingTop(3).Text(viewModel.TimeEntryPlaceholder).FontSize(6).Italic();
                         }
                     });
                 }
@@ -118,10 +103,10 @@ public class ScheduleDocument(
     {
         container.PaddingTop(10).Column(col =>
         {
-            if (footnotes.Count > 0)
+            if (viewModel.ConflictWarnings.Count > 0)
             {
-                col.Item().PaddingBottom(4).Text("Conflict Warnings:").Bold().FontSize(8);
-                foreach (var fn in footnotes)
+                col.Item().PaddingBottom(4).Text(viewModel.ConflictWarningsHeader).Bold().FontSize(8);
+                foreach (var fn in viewModel.ConflictWarnings)
                 {
                     col.Item().Text(text =>
                     {
@@ -131,27 +116,16 @@ public class ScheduleDocument(
                 }
             }
 
-            var medsWithNotes = medications.Where(m => !string.IsNullOrWhiteSpace(m.Notes)).ToList();
-            if (medsWithNotes.Count > 0)
+            if (viewModel.MedicationNotes.Count > 0)
             {
-                col.Item().PaddingTop(6).PaddingBottom(4).Text("Notes:").Bold().FontSize(8);
-                foreach (var med in medsWithNotes)
+                col.Item().PaddingTop(6).PaddingBottom(4).Text(viewModel.NotesHeader).Bold().FontSize(8);
+                foreach (var med in viewModel.MedicationNotes)
                 {
-                    col.Item().Text($"- {med.Name}: {med.Notes}").FontSize(8);
+                    col.Item().Text($"- {med.MedicationName}: {med.Note}").FontSize(8);
                 }
             }
         });
     }
-
-    private static string BlockLabel(TimeBlock block) => block switch
-    {
-        TimeBlock.Morning => "Morning\n(7-9 AM)",
-        TimeBlock.Midday => "Midday\n(11 AM-1 PM)",
-        TimeBlock.Afternoon => "Afternoon\n(2-4 PM)",
-        TimeBlock.Evening => "Evening\n(5-7 PM)",
-        TimeBlock.Bedtime => "Bedtime\n(9-10 PM)",
-        _ => block.ToString()
-    };
 
     private static IContainer HeaderCellStyle(IContainer c) =>
         c.Border(0.5f).BorderColor(Colors.Grey.Medium)
