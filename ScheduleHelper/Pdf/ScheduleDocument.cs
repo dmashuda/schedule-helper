@@ -5,21 +5,14 @@ using ScheduleHelper.Models;
 
 namespace ScheduleHelper.Pdf;
 
-public class ScheduleDocument : IDocument
+public class ScheduleDocument(
+    List<ScheduleDay> days,
+    List<ConflictFootnote> footnotes,
+    List<MedicationRule> medications)
+    : IDocument
 {
-    private readonly List<ScheduleDay> _days;
-    private readonly List<ConflictFootnote> _footnotes;
-    private readonly List<MedicationRule> _medications;
-
     private static readonly TimeBlock[] AllBlocks =
         [TimeBlock.Morning, TimeBlock.Midday, TimeBlock.Afternoon, TimeBlock.Evening, TimeBlock.Bedtime];
-
-    public ScheduleDocument(List<ScheduleDay> days, List<ConflictFootnote> footnotes, List<MedicationRule> medications)
-    {
-        _days = days;
-        _footnotes = footnotes;
-        _medications = medications;
-    }
 
     public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
@@ -45,8 +38,8 @@ public class ScheduleDocument : IDocument
 
     private void ComposeHeader(IContainer container)
     {
-        var startDate = _days.First().Date;
-        var endDate = _days.Last().Date;
+        var startDate = days.First().Date;
+        var endDate = days.Last().Date;
 
         container.PaddingBottom(8).Column(col =>
         {
@@ -63,7 +56,7 @@ public class ScheduleDocument : IDocument
             table.ColumnsDefinition(cols =>
             {
                 cols.ConstantColumn(80); // time block label
-                foreach (var _ in _days)
+                foreach (var _ in days)
                     cols.RelativeColumn();
             });
 
@@ -71,7 +64,7 @@ public class ScheduleDocument : IDocument
             table.Header(header =>
             {
                 header.Cell().Element(HeaderCellStyle).Text("Time Block");
-                foreach (var day in _days)
+                foreach (var day in days)
                 {
                     header.Cell().Element(HeaderCellStyle)
                         .Text($"Day {day.DayNumber}\n{day.Date:ddd M/d}");
@@ -83,7 +76,7 @@ public class ScheduleDocument : IDocument
             {
                 table.Cell().Element(LabelCellStyle).Text(BlockLabel(block));
 
-                foreach (var day in _days)
+                foreach (var day in days)
                 {
                     table.Cell().Element(DataCellStyle).Column(col =>
                     {
@@ -125,10 +118,10 @@ public class ScheduleDocument : IDocument
     {
         container.PaddingTop(10).Column(col =>
         {
-            if (_footnotes.Count > 0)
+            if (footnotes.Count > 0)
             {
                 col.Item().PaddingBottom(4).Text("Conflict Warnings:").Bold().FontSize(8);
-                foreach (var fn in _footnotes)
+                foreach (var fn in footnotes)
                 {
                     col.Item().Text(text =>
                     {
@@ -138,7 +131,7 @@ public class ScheduleDocument : IDocument
                 }
             }
 
-            var medsWithNotes = _medications.Where(m => !string.IsNullOrWhiteSpace(m.Notes)).ToList();
+            var medsWithNotes = medications.Where(m => !string.IsNullOrWhiteSpace(m.Notes)).ToList();
             if (medsWithNotes.Count > 0)
             {
                 col.Item().PaddingTop(6).PaddingBottom(4).Text("Notes:").Bold().FontSize(8);
