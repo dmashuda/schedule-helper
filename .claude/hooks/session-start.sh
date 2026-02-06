@@ -29,6 +29,7 @@ if ! dotnet --version 2>/dev/null | grep -q '^10\.'; then
   rm -f /tmp/dotnet-install.sh
 fi
 
-# Restore NuGet packages
+# Restore NuGet packages (non-fatal — a transient network issue should not
+# prevent the session from starting; the agent can retry restore later).
 cd "$CLAUDE_PROJECT_DIR"
-dotnet restore
+dotnet restore || echo "WARNING: dotnet restore failed; packages may need to be restored manually."
