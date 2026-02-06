@@ -33,8 +33,8 @@ public class ScheduleDocument(ScheduleViewModel viewModel) : IDocument
     {
         container.PaddingBottom(8).Column(col =>
         {
-            col.Item().Text(viewModel.Title).Bold().FontSize(14);
-            col.Item().Text(viewModel.DateRange).FontSize(10);
+            col.Item().Text(viewModel.Title).Style(TitleStyle);
+            col.Item().Text(viewModel.DateRange).Style(DateRangeStyle);
         });
     }
 
@@ -69,7 +69,7 @@ public class ScheduleDocument(ScheduleViewModel viewModel) : IDocument
                     {
                         if (entries.Count == 0)
                         {
-                            col.Item().Text("").FontSize(7);
+                            col.Item().Text("").Style(EntryTextStyle);
                         }
                         else
                         {
@@ -77,21 +77,20 @@ public class ScheduleDocument(ScheduleViewModel viewModel) : IDocument
                             {
                                 col.Item().Row(row =>
                                 {
-                                    row.ConstantItem(12).Height(10).Width(10)
-                                        .Border(0.75f).BorderColor(Colors.Black);
+                                    row.ConstantItem(12).Element(CheckboxStyle);
 
                                     row.RelativeItem().PaddingLeft(3).Text(text =>
                                     {
-                                        text.Span(entry.Label).FontSize(7);
+                                        text.Span(entry.Label).Style(EntryTextStyle);
                                         foreach (var fn in entry.FootnoteNumbers)
                                         {
-                                            text.Span($" [{fn}]").FontSize(6).Bold().FontColor(Colors.Red.Medium);
+                                            text.Span($" [{fn}]").Style(FootnoteMarkerStyle);
                                         }
                                     });
                                 });
                             }
 
-                            col.Item().PaddingTop(3).Text(viewModel.TimeEntryPlaceholder).FontSize(6).Italic();
+                            col.Item().PaddingTop(3).Text(viewModel.TimeEntryPlaceholder).Style(SmallTextStyle).Italic();
                         }
                     });
                 }
@@ -105,12 +104,12 @@ public class ScheduleDocument(ScheduleViewModel viewModel) : IDocument
         {
             if (viewModel.ConflictWarnings.Count > 0)
             {
-                col.Item().PaddingBottom(4).Text(viewModel.ConflictWarningsHeader).Bold().FontSize(8);
+                col.Item().PaddingBottom(4).Text(viewModel.ConflictWarningsHeader).Style(SectionHeaderStyle);
                 foreach (var fn in viewModel.ConflictWarnings)
                 {
                     col.Item().Text(text =>
                     {
-                        text.Span($"[{fn.Number}] ").Bold().FontColor(Colors.Red.Medium);
+                        text.Span($"[{fn.Number}] ").Style(FootnoteMarkerStyle);
                         text.Span(fn.Note);
                     });
                 }
@@ -118,15 +117,16 @@ public class ScheduleDocument(ScheduleViewModel viewModel) : IDocument
 
             if (viewModel.MedicationNotes.Count > 0)
             {
-                col.Item().PaddingTop(6).PaddingBottom(4).Text(viewModel.NotesHeader).Bold().FontSize(8);
+                col.Item().PaddingTop(6).PaddingBottom(4).Text(viewModel.NotesHeader).Style(SectionHeaderStyle);
                 foreach (var med in viewModel.MedicationNotes)
                 {
-                    col.Item().Text($"- {med.MedicationName}: {med.Note}").FontSize(8);
+                    col.Item().Text($"- {med.MedicationName}: {med.Note}").Style(FooterTextStyle);
                 }
             }
         });
     }
 
+    // Container styles
     private static IContainer HeaderCellStyle(IContainer c) =>
         c.Border(0.5f).BorderColor(Colors.Grey.Medium)
          .Background(Colors.Grey.Lighten3)
@@ -140,4 +140,16 @@ public class ScheduleDocument(ScheduleViewModel viewModel) : IDocument
     private static IContainer DataCellStyle(IContainer c) =>
         c.Border(0.5f).BorderColor(Colors.Grey.Medium)
          .Padding(3);
+
+    private static IContainer CheckboxStyle(IContainer c) =>
+        c.Height(10).Width(10).Border(0.75f).BorderColor(Colors.Black);
+
+    // Text styles
+    private static TextStyle TitleStyle => TextStyle.Default.FontSize(14).Bold();
+    private static TextStyle DateRangeStyle => TextStyle.Default.FontSize(10);
+    private static TextStyle EntryTextStyle => TextStyle.Default.FontSize(7);
+    private static TextStyle SmallTextStyle => TextStyle.Default.FontSize(6);
+    private static TextStyle FootnoteMarkerStyle => TextStyle.Default.FontSize(6).Bold().FontColor(Colors.Red.Medium);
+    private static TextStyle SectionHeaderStyle => TextStyle.Default.FontSize(8).Bold();
+    private static TextStyle FooterTextStyle => TextStyle.Default.FontSize(8);
 }
