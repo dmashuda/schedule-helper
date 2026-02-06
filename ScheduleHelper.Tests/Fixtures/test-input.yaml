@@ -1,0 +1,31 @@
+schedule:
+  days: 3
+  start_date: "2026-01-01"
+
+medications:
+  - id: med_a
+    name: Medication A
+    dose: "100mg"
+    frequency: "2x daily"
+    duration_days: 3
+    time_blocks: [Morning, Evening]
+    notes: "Take with food"
+
+  - id: med_b
+    name: Medication B
+    dose: "50mg"
+    frequency: "1x daily"
+    duration_days: 2
+    time_blocks: [Morning]
+
+  - id: med_c
+    name: Medication C
+    dose: "200mg"
+    frequency: "1x daily"
+    duration_days: 3
+    time_blocks: [Midday]
+
+conflicts:
+  - medications: [med_a, med_b]
+    min_hours_apart: 2
+    note: "Medication A and B should be taken 2 hours apart"

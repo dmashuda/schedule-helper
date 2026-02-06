@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleHelper", "ScheduleHelper\ScheduleHelper.csproj", "{F7D377F8-B404-4304-904C-177FB7810176}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleHelper.Tests", "ScheduleHelper.Tests\ScheduleHelper.Tests.csproj", "{0790F261-9007-46BC-9D8E-CD2A60CF8884}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{F7D377F8-B404-4304-904C-177FB7810176}.Release|x64.Build.0 = Release|Any CPU
 		{F7D377F8-B404-4304-904C-177FB7810176}.Release|x86.ActiveCfg = Release|Any CPU
 		{F7D377F8-B404-4304-904C-177FB7810176}.Release|x86.Build.0 = Release|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Debug|x64.Build.0 = Debug|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Debug|x86.Build.0 = Debug|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Release|x64.ActiveCfg = Release|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Release|x64.Build.0 = Release|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Release|x86.ActiveCfg = Release|Any CPU
+		{0790F261-9007-46BC-9D8E-CD2A60CF8884}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
