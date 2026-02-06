@@ -1,0 +1,44 @@
+schedule:
+  days: 7
+  start_date: "2026-02-06"
+
+medications:
+  - id: amoxicillin
+    name: Amoxicillin
+    dose: "500mg"
+    frequency: "3x daily"
+    duration_days: 10
+    time_blocks: [Morning, Midday, Evening]
+    notes: "Take with food"
+
+  - id: ibuprofen
+    name: Ibuprofen
+    dose: "400mg"
+    frequency: "Every 6 hours as needed"
+    duration_days: 5
+    time_blocks: [Morning, Afternoon, Evening, Bedtime]
+    notes: "Take with food or milk"
+
+  - id: iron
+    name: Iron Supplement
+    dose: "325mg"
+    frequency: "1x daily"
+    duration_days: 30
+    time_blocks: [Midday]
+
+  - id: probiotic
+    name: Probiotic
+    dose: "1 capsule"
+    frequency: "1x daily"
+    duration_days: 14
+    time_blocks: [Morning]
+    notes: "Take 2 hours apart from antibiotic"
+
+conflicts:
+  - medications: [amoxicillin, iron]
+    min_hours_apart: 2
+    note: "Iron reduces antibiotic absorption - take at least 2 hours apart"
+
+  - medications: [amoxicillin, probiotic]
+    min_hours_apart: 2
+    note: "Take probiotic at least 2 hours after antibiotic for best effectiveness"
