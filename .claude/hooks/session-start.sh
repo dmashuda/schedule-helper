@@ -8,7 +8,7 @@ fi
 
 # Install .NET SDK 10.0 if not already installed
 if ! dotnet --version 2>/dev/null | grep -q '^10\.'; then
-  sudo apt-get update && sudo apt-get install -y dotnet-sdk-10.0
+  apt-get update && apt-get install -y dotnet-sdk-10.0
 fi
 
 # Restore NuGet packages
